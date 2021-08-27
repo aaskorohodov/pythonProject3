@@ -6,6 +6,18 @@ def respond_processor(message):
     name = user_recognition(message.from_user.id)
     mes = message.text.lower()
     response = ''
+
+    yes = ['да', 'yes', 'ага', 'ну да']
+    yes_responde = ['что да?', 'да?', 'точно да?', 'да-да?', 'да - что?', 'точно?', 'уверен?', 'да', 'нет', 'да почему?']
+    if mes in yes:
+        return random.choice(yes_responde)
+
+    no = ['нет', 'no', 'неа', 'ну нет']
+    no_responde = ['что нет?', 'нет?', 'точно нет?', 'не нет, так нет', 'нет нет', 'точно?', 'уверен?', 'да', 'нет',
+                    'почему?']
+    if mes in no:
+        return random.choice(no_responde)
+
     hello = ['привет', 'здравствуйте', 'hello', 'hi', 'хелоу', 'хело', 'хай', 'йо', 'добрый день', 'добрый вечер', 'приффки', 'прифки', 'ghbdtn', 'lj,hsq ltym']
     hello_responde = ['привет', 'здравствуйте', 'hello', 'hi', 'хелоу', 'хело', 'хай', 'йо', 'добрый день', 'добрый вечер', 'приффки', 'прифки']
 
@@ -119,7 +131,7 @@ def respond_processor(message):
             mes = mes.replace(el, '')
 
 
-    what_is = ['что такое', 'что ты думаешь', 'кто такой', 'что думаешь', 'что думаешь про', 'как устроен', 'расскажи про']
+    what_is = ['что такое', 'кто такой', 'что думаешь про', 'как устроен']
     what_is_responde = [f'хз, погугли https://www.google.com/search?q={mes.replace(" ", "")}']
     for el in what_is:
         if el in mes:
@@ -134,9 +146,9 @@ def respond_processor(message):
             response += random.choice(short_questresp) + ' '
             mes = mes.replace(el, '')
 
-    name = ['сменить имя', 'поменять имя', 'другое имя', 'зови меня']
+    name_ch = ['сменить имя', 'поменять имя', 'другое имя', 'зови меня']
     name_responde = ['/name']
-    for el in name:
+    for el in name_ch:
         if el in mes:
             response += random.choice(name_responde) + ' '
             mes = mes.replace(el, '')
@@ -148,6 +160,21 @@ def respond_processor(message):
             response += random.choice(start_responde) + ' '
             mes = mes.replace(el, '')
 
+    whats_ur_name = ['как тебя зовут', 'как тебя звать', 'как твое имя', 'давай знакомиться', 'кто ты?', 'ты кто?', 'а тебя?']
+    whats_ur_name_responde = ['у меня еще нет имени', 'мне еще не придумали имя', 'пока я этого не знаю', 'usless_bot', 'я Наполеон. Также я несу и другую хрень',
+                              'а я помидор', 'я Джабар – индийский студент. Подрабатываю притворяясь ботом', 'Giovanni Giorgio, but everybody caals me Giorgio']
+    for el in whats_ur_name:
+        if el in mes:
+            response += random.choice(whats_ur_name_responde) + ' '
+            mes = mes.replace(el, '')
+
+    whats_my_name = ['как меня зовут', 'как меня звать', 'как мое имя', 'как моё имя', 'а меня?']
+    whats_my_name_responde = [f'тебя зовут {name}', f'вроде бы {name}', f'{name}', f'{name}?', f'ЭЭэээ... {name}?', f'{name} человек. А я {name} Бот', f'{name}, тебя зоут {name}']
+
+    for el in whats_my_name:
+        if el in mes:
+            response += random.choice(whats_my_name_responde) + ' '
+            mes = mes.replace(el, '')
 
 
 

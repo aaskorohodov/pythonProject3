@@ -1,3 +1,6 @@
+from Processors.user_recognition import user_recognition
+
+
 def clean_num(text):
     alphabet = 'abcdefghijklmnopqrstuvwxyz\|/абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
     num = ''
@@ -43,4 +46,24 @@ def bmi(h, w):
         return bmi_res + 'ИМТ выше 25 считается избыточным.'
 
 
-print(bmi('asd', 'asd'))
+def fib(message):
+    name = user_recognition(message.from_user.id)
+    c_num = ''
+    alphabet = 'abcdefghijklmnopqrstuvwxyz\|/абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+    for el in message.text:
+        if el not in alphabet:
+            c_num += el
+
+    if int(c_num) == 0:
+        return '0'
+
+    try:
+        c_num = int(c_num)
+    except:
+        return f'{name}, ты вводишь что-то не то\n' \
+               f'/fib'
+
+    one, two = 0, 1
+    for i in range(c_num - 1):
+        one, two = two, one + two
+    return str(two)

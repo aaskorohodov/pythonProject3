@@ -1,13 +1,14 @@
-import random
-import time
-import telebot
+import random, time, telebot
 from telebot import types
 from PIL import Image
 from Processors.log import log
+from Processors.user_recognition import user_recognition
 
 
 bot = telebot.TeleBot('1879041775:AAG14Vz9P4AP4hjOGOOwYKbbFJGFSrWQEgs')
 stop = ['все', 'Все', 'ВСЕ', 'ВСе', 'всё', 'ВСё', 'ВСЁ', 'Всё', 'dct', 'Dct', 'DCt', 'DCT', 'dc`', 'Dc`', 'DC`', 'DC~']
+lists = ['lists', 'create', 'add']
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -15,7 +16,7 @@ def send_welcome(message):
     name = user_recognition(message.from_user.id)
     if name == False:
         send_mess = 'Кажется, мы еще не знакомы! Как тебя зовут?'
-        bot.send_message(message.chat.id, send_mess)
+        bot.send_message(message.from_user.id, send_mess)
         log(message.text, message.from_user.username, send_mess)
         def whats_ur_name(message):
             excl = ['меня', 'зовут', 'я', 'а', 'тебя', 'как', 'звать', 'name', 'my', 'зови', 'пускай', 'будет']
@@ -25,7 +26,7 @@ def send_welcome(message):
                     name += el
             from Processors.user_recognition import new_user
             new_user(message.from_user.id, name)
-            bot.send_message(message.chat.id, 'Отлично, теперь давай начнем сначала')
+            bot.send_message(message.from_user.id, 'Отлично, теперь давай начнем сначала')
             log(message.text, message.from_user.username, send_mess)
             time.sleep(2)
             send_welcome(message)
@@ -34,10 +35,10 @@ def send_welcome(message):
         send_mess = f'Привет {name}! Вот что умеет этот бот:\n' \
                     f'\n' \
                     f'/start – включить бота/начать общение с начала\n' \
-                    f'/math – разная матиматика' \
-                    f'/calc – открыть калькулятор\n' \
+                    f'/math – разная матиматика\n' \
                     f'/stuff – всякие штуки\n' \
                     f'/name – изменить свое имя\n' \
+                    f'/lists – личные списки\n' \
                     f'\n' \
                     f'А еще могу говорить.'
         log(message.text, message.from_user.username, send_mess)
@@ -45,8 +46,9 @@ def send_welcome(message):
 
 
 @bot.message_handler(commands=['stuff', 'reversed', 'popka', 'time', 'pics', 'weather', 'food', 'covid', 'anagramm',
-                               'letters', 'timer'])
+                               'letters', 'timer', 'test', 'b_day', 'translate', 'ru_eng', 'eng_ru'])
 def staff_handler(message):
+    name = user_recognition(message.from_user.id)
     if message.text == '/stuff':
         send_mess = '/reversed – слова наоборот\n' \
                     '/popka – попугай\n' \
@@ -56,7 +58,10 @@ def staff_handler(message):
                     '/pics – даст случайную картинку\n' \
                     '/covid – даст статистику по ковиду\n' \
                     '/anagramm – поиск анаграмм\n' \
-                    '/letters – считает повторы букв'
+                    '/letters – считает повторы букв\n' \
+                    '/timer – таймер\n' \
+                    '/b_day – время до дня рождения\n' \
+                    '/translate – переводчик'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
 
@@ -119,7 +124,7 @@ def staff_handler(message):
         bot.send_photo(message.from_user.id, png)
 
     elif message.text == '/weather':
-        send_mess = 'Какой город?'
+        send_mess = f'{name}, в каком городе ты живешь?'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess)
 
@@ -139,7 +144,7 @@ def staff_handler(message):
         outdoor = types.InlineKeyboardButton(text='Сходить в...', callback_data="outdoor")
         markup.add(self, fast, outdoor)
 
-        send_mess = 'Что хочется?'
+        send_mess = f'Что хочет {name}?'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess, reply_markup=markup)
 
@@ -149,7 +154,7 @@ def staff_handler(message):
         covid(message)
 
     elif message.text == '/anagramm':
-        send_mess = 'Дайте текст, а я найду в нем анаграммы.\n' \
+        send_mess = f'{name}, дай текст, а я найду в нем анаграммы.\n' \
                     '\n' \
                     '*поддерживается только английский и русский'
         log(message.text, message.from_user.username, send_mess)
@@ -162,7 +167,7 @@ def staff_handler(message):
         bot.register_next_step_handler(message, anagramms_pross)
 
     elif message.text == '/letters':
-        send_mess = 'Дайте текст, а я посчитаю повторы букв'
+        send_mess = f'{name}, давай свой текст, а я посчитаю повторы букв'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess)
         def letters(message):
@@ -173,34 +178,79 @@ def staff_handler(message):
         bot.register_next_step_handler(message, letters)
 
     elif message.text == '/timer':
-        send_mess = 'Задайте число секунд, которые таймер будет работать'
+        from Processors.timer import timer_step1
+        name = user_recognition(message.from_user.id)
+        timer_step1(message, name)
+
+    elif message.text == '/b_day':
+        send_mess = f'Тут можно узнать, когда у кого-то будет следующий день рождения.\n' \
+                    f'\n' \
+                    f'Введи дату рождения в формате [Год Месяц День] через пробелы'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess)
-        def timer(message):
-            send_mess = 'Ready!'
+
+        def birthday(message):
+            from Processors.stuff import age
+            send_mess = age(message.text)
             log(message.text, message.from_user.username, send_mess)
-            tim = int(message.text)
-            msq = bot.send_message(message.chat.id, send_mess)
-            for i in range(tim + 1):
-                def timer(message, i):
-                    time.sleep(1)
-                    bot.edit_message_text(i, chat_id=message.chat.id, message_id=msq.message_id)
-                timer(message, i)
-            send_mess = f'Таймер сработал! Прошло {tim} секунд'
             bot.send_message(message.from_user.id, send_mess)
-        bot.register_next_step_handler(message, timer)
+
+        bot.register_next_step_handler(message, birthday)
+
+    elif message.text == '/translate':
+        send_mess = '/ru_eng\n' \
+                    '/eng_ru'
+        log(message.text, message.from_user.username, send_mess)
+        bot.send_message(message.from_user.id, send_mess)
+
+    elif message.text == '/ru_eng':
+        send_mess = 'Могу перевести слово или простую фразу. Пиши'
+        log(message.text, message.from_user.username, send_mess)
+        bot.send_message(message.from_user.id, send_mess)
+
+        def ru_eng(message):
+            from Processors.translation import ru_eng
+            send_mess = ru_eng(message)
+            log(message.text, message.from_user.username, send_mess)
+            bot.send_message(message.from_user.id, send_mess)
+            time.sleep(2)
+            send_mess = 'Еще?\n' \
+                        '/ru_eng\n' \
+                        '/eng_ru'
+            log(message.text, message.from_user.username, send_mess)
+            bot.send_message(message.from_user.id, send_mess)
+
+        bot.register_next_step_handler(message, ru_eng)
+
+    elif message.text == '/eng_ru':
+        send_mess = 'Могу перевести слово или простую фразу. Пиши'
+        log(message.text, message.from_user.username, send_mess)
+        bot.send_message(message.from_user.id, send_mess)
+
+        def eng_ru(message):
+            from Processors.translation import eng_ru
+            send_mess = eng_ru(message)
+            log(message.text, message.from_user.username, send_mess)
+            bot.send_message(message.from_user.id, send_mess)
+            time.sleep(2)
+            send_mess = 'Еще?\n' \
+                        '/ru_eng\n' \
+                        '/eng_ru'
+            log(message.text, message.from_user.username, send_mess)
+            bot.send_message(message.from_user.id, send_mess)
+
+        bot.register_next_step_handler(message, eng_ru)
 
 
-
-
-@bot.message_handler(commands=['math', 'calc', 'area', 'bmi'])
+@bot.message_handler(commands=['math', 'calc', 'area', 'bmi', 'fib'])
 def math_handler(message):
     if message.text == '/math':
-        send_mess = 'Это матиматический модуль. Вот что умеет:\n' \
+        send_mess = 'Это матиматический модуль. Вот что я умею:\n' \
                     '\n' \
                     '/calc – калькулятор\n' \
                     '/area – площадь прямоугольника\n' \
-                    '/bmi – рассчет массы тела'
+                    '/bmi – рассчет массы тела\n' \
+                    '/fib - число фибоначи'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
 
@@ -271,6 +321,56 @@ def math_handler(message):
             bot.register_next_step_handler(message, weight)
         bot.register_next_step_handler(message, height)
 
+    elif message.text == '/fib':
+        send_mess = 'Напиши номер числа фибоначи, а я покажу это число\n' \
+                    '\n' \
+                    '!!! Обрати внимание, что телеграмм не даст отправить слишком большое письмо. Числа по номеру свыше ~15000 может не пройти'
+        log(message.text, message.from_user.username, send_mess)
+        bot.send_message(message.chat.id, send_mess)
+        def fib_call(message):
+            from Processors.math import fib
+            send_mess = fib(message)
+            log(message.text, message.from_user.username, send_mess)
+            bot.send_message(message.chat.id, send_mess)
+        bot.register_next_step_handler(message, fib_call)
+
+
+@bot.message_handler(commands=lists)
+def lists_handler(message):
+    def add(message, list_name):
+        print('add', message.text, list_name)
+    if message.text == '/lists':
+        add = '\n/create – создать список'
+        from lists_sql import lists_checker
+        send_mess, commands = lists_checker(message)
+        send_mess += add
+        if commands == None:
+            bot.send_message(message.chat.id, send_mess)
+        else:
+            global lists
+            for el in commands:
+                lists.append(el)
+            bot.send_message(message.chat.id, send_mess)
+
+    elif message.text == '/create':
+        send_mess = 'Задайте имя списка'
+        bot.send_message(message.chat.id, send_mess)
+        def l_creating(message):
+            from lists_sql import list_creating
+            send_mess, commands = list_creating(message)
+            global lists
+            for el in commands:
+                lists.append(el)
+            bot.send_message(message.chat.id, send_mess)
+        bot.register_next_step_handler(message, l_creating)
+
+    else:
+        from lists_sql import items
+        send_mess, list_name = items(message)
+        bot.send_message(message.chat.id, send_mess)
+        bot.register_next_step_handler(message, add, list_name)
+
+
 
 @bot.message_handler(commands=['name'])
 def name_change(message):
@@ -288,7 +388,8 @@ def name_change(message):
 
 @bot.message_handler(content_types=['text'])
 def messages(message):
-    print(message)
+    global lists
+    print(message.from_user.id)
     from Processors.text_respond import respond_processor
     send_mess = respond_processor(message)
     log(message.text, message.from_user.username, send_mess)
@@ -306,8 +407,8 @@ def photo(message):
 def query_handler(call):
     from Processors.food_processor import food_handler
     food_handler(call)
-
-
+    from Processors.timer import timer_pross
+    timer_pross(call)
 
 
 while True:
@@ -315,6 +416,5 @@ while True:
         bot.polling(none_stop=True)
 
     except Exception as e:
-        import time
         print(e)
         time.sleep(0.5)

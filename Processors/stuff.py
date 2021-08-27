@@ -124,3 +124,55 @@ def letters_counter(text):
                 res += f'\n{k}:   {v}'
 
     return res
+
+
+def age(birth_date):
+    from datetime import date
+
+    test = birth_date.split()
+
+    try:
+        for el in test:
+            int(el)
+    except:
+        return 'Что-то не то, попробуй еще раз /b_day'
+
+    if len(test) != 3:
+        return 'Что-то не то, попробуй еще раз /b_day'
+
+    send_mess = ''
+
+    try:
+        birth_date = date(int(test[0]), int(test[1]), int(test[2]))
+    except:
+        return 'Такой даты не существует. /b_day'
+
+    today = date.today()
+
+    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+    if age < 0:
+        return 'Это существо еще не родилось. /b_day'
+    if age > 80:
+        send_mess += f'Возраст: {age} лет. Это много\n'
+    else:
+        send_mess += f'Возраст: {age} лет\n'
+
+    next_birthday = date(today.year, birth_date.month, birth_date.day)
+    send_mess += f'Следующий день рождения: {next_birthday}\n'
+
+    this_year_bday = date(today.year, birth_date.month, birth_date.day)
+    if today > this_year_bday:
+        next_birthday = date(today.year + 1, birth_date.month, birth_date.day)
+    delta = next_birthday - today
+
+    if delta.days < 10:
+        send_mess += f'Дней до следующего дня рождения: {delta.days}! Торопитесь с подарком!\n'
+    else:
+        send_mess += f'Дней до следующего дня рождения: {delta.days}\n'
+    send_mess += '\n' \
+                 'Еще? /b_day'
+
+    return send_mess
+
+

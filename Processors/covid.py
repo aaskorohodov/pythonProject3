@@ -1,10 +1,12 @@
 import requests, bs4, time, telebot
+from Processors.user_recognition import user_recognition
 
 
 bot = telebot.TeleBot('1879041775:AAG14Vz9P4AP4hjOGOOwYKbbFJGFSrWQEgs')
 
 
 def covid(message):
+    name = user_recognition(message.from_user.id)
     html = requests.get('https://xn--80aesfpebagmfblc0a.xn--p1ai/')
     soup = bs4.BeautifulSoup(html.text, "html.parser")
     class_all = soup.find_all(class_='cv-countdown__item-value _accent')
@@ -30,4 +32,7 @@ def covid(message):
     bot.edit_message_text("Получаю статистику.........", chat_id=message.chat.id, message_id=msq.message_id)
     time.sleep(0.5)
     bot.edit_message_text("Получаю статистику..........", chat_id=message.chat.id, message_id=msq.message_id)
+    bot.send_message(message.chat.id, send_mess)
+    time.sleep(3)
+    send_mess = f'Надеюсь, {name}, у тебя есть привика'
     bot.send_message(message.chat.id, send_mess)

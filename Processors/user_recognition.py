@@ -22,6 +22,8 @@ def new_user(user_id, name):
         users = {}
         users[user_id] = name
 
+    users[user_id] = name
+
     with open('users.txt', 'wb') as file:
         pickle.dump(users, file)
 
