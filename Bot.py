@@ -14,10 +14,12 @@ lists = ['lists', 'create', 'add']
 def send_welcome(message):
     from Processors.user_recognition import user_recognition
     name = user_recognition(message.from_user.id)
+
     if name == False:
         send_mess = 'Кажется, мы еще не знакомы! Как тебя зовут?'
         bot.send_message(message.from_user.id, send_mess)
         log(message.text, message.from_user.username, send_mess)
+
         def whats_ur_name(message):
             excl = ['меня', 'зовут', 'я', 'а', 'тебя', 'как', 'звать', 'name', 'my', 'зови', 'пускай', 'будет']
             name = ''
@@ -30,7 +32,9 @@ def send_welcome(message):
             log(message.text, message.from_user.username, send_mess)
             time.sleep(2)
             send_welcome(message)
+
         bot.register_next_step_handler(message, whats_ur_name)
+
     else:
         send_mess = f'Привет {name}! Вот что умеет этот бот:\n' \
                     f'\n' \
@@ -70,6 +74,7 @@ def staff_handler(message):
                     'Для выхода пиши "все"'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
+
         def reversed(message):
             if message.text in stop:
                 send_mess = 'reversed остановлен.\n' \
@@ -82,6 +87,7 @@ def staff_handler(message):
                 bot.send_message(message.chat.id, send_mess)
                 log(message.text, message.from_user.username, send_mess)
                 bot.register_next_step_handler(message, reversed)
+
         bot.register_next_step_handler(message, reversed)
 
     elif message.text == '/popka':
@@ -97,6 +103,7 @@ def staff_handler(message):
                 log(message.text, message.from_user.username, send_mess)
                 bot.send_message(message.from_user.id, send_mess)
                 bot.register_next_step_handler(message, popca_pross)
+
         send_mess = 'Пишите что хотите, когда надоест, напишите "все".'
         bot.send_message(message.chat.id, send_mess)
         log(message.text, message.from_user.username, send_mess)
@@ -106,11 +113,13 @@ def staff_handler(message):
         send_mess = 'Какой город смотрим?'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
+
         def time_get(message):
             from Processors.time import output
             send_mess = output(message.text)
             log(message.text, message.from_user.username, send_mess)
             bot.send_message(message.chat.id, send_mess)
+
         bot.register_next_step_handler(message, time_get)
 
     elif message.text == '/pics':
@@ -159,22 +168,26 @@ def staff_handler(message):
                     '*поддерживается только английский и русский'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess)
+
         def anagramms_pross(message):
             from Processors.stuff import anagrams
             send_mess = anagrams(message.text)
             log(message.text, message.from_user.username, send_mess)
             bot.send_message(message.from_user.id, send_mess)
+
         bot.register_next_step_handler(message, anagramms_pross)
 
     elif message.text == '/letters':
         send_mess = f'{name}, давай свой текст, а я посчитаю повторы букв'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess)
+
         def letters(message):
             from Processors.stuff import letters_counter
             send_mess = letters_counter(message.text)
             log(message.text, message.from_user.username, send_mess)
             bot.send_message(message.from_user.id, send_mess)
+
         bot.register_next_step_handler(message, letters)
 
     elif message.text == '/timer':
@@ -284,6 +297,7 @@ def math_handler(message):
                     'Введите две стороны'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
+
         def area_handler(message):
             if message.text in stop:
                 send_mess = 'area остановлен.\n' \
@@ -307,31 +321,37 @@ def math_handler(message):
         send_mess = 'Какой у тебя рост?'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
+
         def height(message):
             height = message.text
             send_mess = 'А какой вес?'
             log(message.text, message.from_user.username, send_mess)
             bot.send_message(message.chat.id, send_mess)
+
             def weight(message):
                 weight = message.text
                 from Processors.math import bmi
                 send_mess = bmi(height, weight)
                 log(message.text, message.from_user.username, send_mess)
                 bot.send_message(message.chat.id, send_mess)
+
             bot.register_next_step_handler(message, weight)
         bot.register_next_step_handler(message, height)
 
     elif message.text == '/fib':
         send_mess = 'Напиши номер числа фибоначи, а я покажу это число\n' \
                     '\n' \
-                    '!!! Обрати внимание, что телеграмм не даст отправить слишком большое письмо. Числа по номеру свыше ~15000 может не пройти'
+                    '!!! Обрати внимание, что телеграмм не даст отправить слишком большое письмо. ' \
+                    'Числа по номеру свыше ~15000 могут не пройти'
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.chat.id, send_mess)
+
         def fib_call(message):
             from Processors.math import fib
             send_mess = fib(message)
             log(message.text, message.from_user.username, send_mess)
             bot.send_message(message.chat.id, send_mess)
+
         bot.register_next_step_handler(message, fib_call)
 
 
@@ -355,6 +375,7 @@ def lists_handler(message):
     elif message.text == '/create':
         send_mess = 'Задайте имя списка'
         bot.send_message(message.chat.id, send_mess)
+
         def l_creating(message):
             from lists_sql import list_creating
             send_mess, commands = list_creating(message)
@@ -377,12 +398,14 @@ def name_change(message):
     send_mess = 'Как мне тебя называть?'
     log(message.text, message.from_user.username, send_mess)
     bot.send_message(message.from_user.id, send_mess)
+
     def name_change(message):
         from Processors.user_recognition import name_change
         name_change(message.from_user.id, message.text)
         send_mess = 'Готово, теперь я буду звать тебя ' + message.text
         log(message.text, message.from_user.username, send_mess)
         bot.send_message(message.from_user.id, send_mess)
+
     bot.register_next_step_handler(message, name_change)
 
 
